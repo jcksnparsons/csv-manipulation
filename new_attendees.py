@@ -10,7 +10,6 @@ connection = "/Users/jcksnparsons/coding-practice/csv_manipulation/db.sqlite3"
 
 def post_to_db(my_list):
     for person in my_list:
-        print(person)
         with sqlite3.connect(connection) as conn:
             db_cursor = conn.cursor()
 
