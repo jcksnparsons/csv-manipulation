@@ -1,32 +1,45 @@
 import csv
+import sqlite3
 
 """
     Messing around with manipulating CSV files in python.
 """
 
+connection = "/Users/jcksnparsons/coding-practice/csv_manipulation/db.sqlite3"
+
+
+def post_to_db(my_list):
+    for person in my_list:
+        print(person)
+        with sqlite3.connect(connection) as conn:
+            db_cursor = conn.cursor()
+
+            db_cursor.execute("""
+                INSERT INTO Attendees (first_name, last_name, email)
+                VALUES (?, ?, ?)""",
+                              (person['first_name'], person['last_name'], person['email']))
+
 
 def get_emails_from_file(file_string):
     """
-        Takes in the name of a file, which is opened, read, and set to a variable.
-        Variable is then looped over and emails in variable are added to a set.
+        Takes in a csv file and returns a list of dictionaries, each containing the contact information for a party attendee.
     """
 
-    opened = open(file_string)
-    read = csv.reader(opened)
+    with open(file_string) as csv_file:
+        reader = csv.DictReader(csv_file)
 
-    set_of_emails = set()
+        list_of_attendees = []
 
-    for line in read:
-        set_of_emails.add(line[2])
+        for row in reader:
 
-    return set_of_emails
+            person_dict = {}
+            for key, value in row.items():
+
+                person_dict[key] = value
+
+            list_of_attendees.append(person_dict)
+
+        post_to_db(list_of_attendees)
 
 
-first_year_emails = get_emails_from_file('attendees1.csv')
-second_year_emails = get_emails_from_file('attendees2.csv')
-
-"""
-    Function has been performed on the 2 files, now I am finding the difference between the 2 files and printing that as output.
-"""
-
-print(second_year_emails.difference(first_year_emails))
+get_emails_from_file('attendees1.csv')
